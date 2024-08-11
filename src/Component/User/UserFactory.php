@@ -19,6 +19,7 @@ class UserFactory
         $user = new User();
         $user->setEmail($email);
         $user->setCreatedAt(new DateTime());
+        $user->setRoles(['ROLE_USER']);
         $user->setPassword($this->passwordEncoder->hashPassword($user, $password));
 
         return $user;
