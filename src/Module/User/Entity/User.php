@@ -16,6 +16,8 @@ use App\Module\Common\Controller\DeleteAction;
 use App\Module\Common\Entity\Interfaces\CreatedAtSettableInterface;
 use App\Module\Common\Entity\Interfaces\DeletedAtSettableInterface;
 use App\Module\Common\Entity\Interfaces\UpdatedAtSettableInterface;
+use App\Module\GymSubscriptionPurchase\Entity\GymSubscriptionPurchase;
+use App\Module\TrainerSubscriptionPurchase\Entity\TrainerSubscriptionPurchase;
 use App\Module\User\Component\Dtos\RefreshTokenRequestDto;
 use App\Module\User\Component\Dtos\TokensDto;
 use App\Module\User\Controller\UserAboutMeAction;
@@ -26,6 +28,8 @@ use App\Module\User\Controller\UserCreateAction;
 use App\Module\User\Controller\UserIsUniqueEmailAction;
 use App\Module\User\Repository\UserRepository;
 use DateTimeInterface;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -151,6 +155,18 @@ class User implements
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?DateTimeInterface $deletedAt = null;
 
+    #[ORM\OneToMany(mappedBy: 'users', targetEntity: GymSubscriptionPurchase::class, orphanRemoval: true)]
+    private Collection $gymSubscriptionPurchases;
+
+    #[ORM\OneToMany(mappedBy: 'users', targetEntity: TrainerSubscriptionPurchase::class, orphanRemoval: true)]
+    private Collection $trainerSubscriptionPurchases;
+
+    public function __construct()
+    {
+        $this->gymSubscriptionPurchases = new ArrayCollection();
+        $this->trainerSubscriptionPurchases = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -270,6 +286,66 @@ class User implements
     public function setDeletedAt(?DateTimeInterface $deletedAt): self
     {
         $this->deletedAt = $deletedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GymSubscriptionPurchase>
+     */
+    public function getGymSubscriptionPurchases(): Collection
+    {
+        return $this->gymSubscriptionPurchases;
+    }
+
+    public function addGymSubscriptionPurchase(GymSubscriptionPurchase $gymSubscriptionPurchase): self
+    {
+        if (!$this->gymSubscriptionPurchases->contains($gymSubscriptionPurchase)) {
+            $this->gymSubscriptionPurchases->add($gymSubscriptionPurchase);
+            $gymSubscriptionPurchase->setUsers($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGymSubscriptionPurchase(GymSubscriptionPurchase $gymSubscriptionPurchase): self
+    {
+        if ($this->gymSubscriptionPurchases->removeElement($gymSubscriptionPurchase)) {
+            // set the owning side to null (unless already changed)
+            if ($gymSubscriptionPurchase->getUsers() === $this) {
+                $gymSubscriptionPurchase->setUsers(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TrainerSubscriptionPurchase>
+     */
+    public function getTrainerSubscriptionPurchases(): Collection
+    {
+        return $this->trainerSubscriptionPurchases;
+    }
+
+    public function addTrainerSubscriptionPurchase(TrainerSubscriptionPurchase $trainerSubscriptionPurchase): self
+    {
+        if (!$this->trainerSubscriptionPurchases->contains($trainerSubscriptionPurchase)) {
+            $this->trainerSubscriptionPurchases->add($trainerSubscriptionPurchase);
+            $trainerSubscriptionPurchase->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTrainerSubscriptionPurchase(TrainerSubscriptionPurchase $trainerSubscriptionPurchase): self
+    {
+        if ($this->trainerSubscriptionPurchases->removeElement($trainerSubscriptionPurchase)) {
+            // set the owning side to null (unless already changed)
+            if ($trainerSubscriptionPurchase->getUser() === $this) {
+                $trainerSubscriptionPurchase->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -10,16 +10,58 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
+#            App:
+#                is_bundle: false
+#                dir: '%kernel.project_dir%/src/Entity'
+#                prefix: 'App\Entity'
+#                alias: App
+            Gym:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/Gym/Entity'
+                prefix: 'App\Module\Gym\Entity'
+                alias: Gym
+
+            GymSubscription:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/GymSubscription/Entity'
+                prefix: 'App\Module\GymSubscription\Entity'
+                alias: GymSubscription
+
+            GymSubscriptionPurchase:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/GymSubscriptionPurchase/Entity'
+                prefix: 'App\Module\GymSubscriptionPurchase\Entity'
+                alias: GymSubscriptionPurchase
+
             User:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Module/User/Entity'
                 prefix: 'App\Module\User\Entity'
                 alias: User
+
             Media:
                 is_bundle: false
                 dir: '%kernel.project_dir%/src/Module/Media/Entity'
                 prefix: 'App\Module\Media\Entity'
                 alias: Media
+
+            Trainer:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/Trainer/Entity'
+                prefix: 'App\Module\Trainer\Entity'
+                alias: Trainer
+
+            TrainerSubscription:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/TrainerSubscription/Entity'
+                prefix: 'App\Module\TrainerSubscription\Entity'
+                alias: TrainerSubscription
+
+            TrainerSubscriptionPurchase:
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Module/TrainerSubscriptionPurchase/Entity'
+                prefix: 'App\Module\TrainerSubscriptionPurchase\Entity'
+                alias: TrainerSubscriptionPurchase
 
 when@test:
     doctrine:

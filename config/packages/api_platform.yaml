@@ -5,8 +5,14 @@ api_platform:
 
     mapping:
         paths: [
-            '%kernel.project_dir%/src/Module/User/Entity',
+            '%kernel.project_dir%/src/Module/Gym/Entity',
+            '%kernel.project_dir%/src/Module/GymSubscription/Entity',
+            '%kernel.project_dir%/src/Module/GymSubscriptionPurchase/Entity',
             '%kernel.project_dir%/src/Module/Media/Entity',
+            '%kernel.project_dir%/src/Module/Trainer/Entity',
+            '%kernel.project_dir%/src/Module/TrainerSubscription/Entity',
+            '%kernel.project_dir%/src/Module/TrainerSubscriptionPurchase/Entity',
+            '%kernel.project_dir%/src/Module/User/Entity',
         ]
 
     patch_formats:
