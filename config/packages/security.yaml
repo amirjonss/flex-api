@@ -1,7 +1,7 @@
 security:
     # https://symfony.com/doc/current/security.html#c-hashing-passwords
     password_hashers:
-        App\Entity\User: auto
+        App\Module\User\Entity\User: auto
 
     # https://symfony.com/doc/current/security/authenticator_manager.html
     enable_authenticator_manager: true
@@ -10,12 +10,12 @@ security:
     providers:
         entity_provider:
             entity:
-                class: App\Entity\User
+                class: App\Module\User\Entity\User
                 property: email
 
         jwt:
             lexik_jwt:
-                class: App\Component\User\Dtos\JwtUserDto
+                class: App\Module\User\Component\Dtos\JwtUserDto
 
     firewalls:
         dev:
