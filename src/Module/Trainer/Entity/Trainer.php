@@ -3,21 +3,56 @@
 namespace App\Module\Trainer\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Module\Common\Controller\DeleteAction;
+use App\Module\Common\Entity\Interfaces\CreatedAtSettableInterface;
+use App\Module\Common\Entity\Interfaces\DeletedAtSettableInterface;
+use App\Module\Common\Entity\Interfaces\DeletedBySettableInterface;
+use App\Module\Common\Entity\Interfaces\UpdatedAtSettableInterface;
 use App\Module\Common\Entity\Trait\CreatedAtTrait;
 use App\Module\Common\Entity\Trait\DeletedTrait;
 use App\Module\Common\Entity\Trait\UpdatedTrait;
 use App\Module\Gym\Entity\Gym;
 use App\Module\Media\Entity\MediaObject;
+use App\Module\Trainer\Controller\CreateTrainerAction;
 use App\Module\Trainer\Repository\TrainerRepository;
 use App\Module\TrainerSubscription\Entity\TrainerSubscription;
 use App\Module\User\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(
+            controller: CreateTrainerAction::class,
+            securityPostDenormalize: "is_granted('ROLE_ADMIN') || object.getGym().getGymAdmin() == user",
+        ),
+        new Put(
+            denormalizationContext: ['groups' => ['trainer:put']],
+            security: "is_granted('ROLE_ADMIN') || object.getUser() == user || object.getGym().getGymAdmin() == user",
+        ),
+        new Delete(
+            controller: DeleteAction::class,
+            security: "is_granted('ROLE_ADMIN') || object.getUser() == user || object.getGym().getGymAdmin() == user"
+        ),
+    ],
+    normalizationContext: ['groups' => ['trainer:read']],
+    denormalizationContext: ['groups' => ['trainer:write']],
+)]
 #[ORM\Entity(repositoryClass: TrainerRepository::class)]
-class Trainer
+class Trainer implements
+    CreatedAtSettableInterface,
+    UpdatedAtSettableInterface,
+    DeletedAtSettableInterface,
+    DeletedBySettableInterface
 {
     use CreatedAtTrait;
     use UpdatedTrait;
@@ -26,26 +61,33 @@ class Trainer
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["trainer:read"])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["trainer:read", "trainer:write", "trainer:put"])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["trainer:read", "trainer:write", "trainer:put"])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(["trainer:read", "trainer:write", "trainer:put"])]
     private ?string $specialization = null;
 
     #[ORM\ManyToOne(inversedBy: 'trainers')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["trainer:read", "trainer:write"])]
     private ?Gym $gym = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(["trainer:read", "trainer:write"])]
     private ?User $user = null;
 
     #[ORM\ManyToOne]
+    #[Groups(["trainer:read", "trainer:write", "trainer:put"])]
     private ?MediaObject $photo = null;
 
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: TrainerSubscription::class, orphanRemoval: true)]

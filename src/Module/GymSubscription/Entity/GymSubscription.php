@@ -3,6 +3,16 @@
 namespace App\Module\GymSubscription\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Module\Common\Controller\DeleteAction;
+use App\Module\Common\Entity\Interfaces\CreatedAtSettableInterface;
+use App\Module\Common\Entity\Interfaces\DeletedAtSettableInterface;
+use App\Module\Common\Entity\Interfaces\DeletedBySettableInterface;
+use App\Module\Common\Entity\Interfaces\UpdatedAtSettableInterface;
 use App\Module\Common\Entity\Trait\CreatedAtTrait;
 use App\Module\Common\Entity\Trait\DeletedTrait;
 use App\Module\Common\Entity\Trait\UpdatedTrait;
@@ -13,10 +23,32 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GymSubscriptionRepository::class)]
-#[ApiResource]
-class GymSubscription
+#[ApiResource(
+    operations: [
+        new Get(),
+        new GetCollection(),
+        new Post(
+            securityPostDenormalize: "is_granted('ROLE_ADMIN') || object.getGym().getGymAdmin() == user",
+        ),
+        new Delete(
+            controller: DeleteAction::class,
+            security: "is_granted('ROLE_ADMIN') || object.getGym().getGymAdmin() == user",
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN') || object.getGym().getGymAdmin() == user",
+        )
+    ],
+    normalizationContext: ['groups' => ['gym-subscription:read']],
+    denormalizationContext: ['groups' => ['gym-subscription:write']], 
+)]
+class GymSubscription implements
+    CreatedAtSettableInterface,
+    UpdatedAtSettableInterface,
+    DeletedAtSettableInterface,
+    DeletedBySettableInterface
 {
     use CreatedAtTrait;
     use UpdatedTrait;
@@ -24,25 +56,32 @@ class GymSubscription
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['gym-subscription:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'gymSubscriptions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?Gym $gym = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?int $duration = null;
 
     #[ORM\Column]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['gym-subscription:read', 'gym-subscription:write'])]
     private ?bool $isActive = null;
 
     #[ORM\OneToMany(mappedBy: 'gymSubscription', targetEntity: GymSubscriptionPurchase::class, orphanRemoval: true)]

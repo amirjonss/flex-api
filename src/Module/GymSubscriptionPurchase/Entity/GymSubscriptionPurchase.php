@@ -3,17 +3,33 @@
 namespace App\Module\GymSubscriptionPurchase\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Module\Common\Entity\Trait\CreatedAtTrait;
 use App\Module\Common\Entity\Trait\DeletedTrait;
 use App\Module\Common\Entity\Trait\UpdatedTrait;
 use App\Module\GymSubscription\Entity\GymSubscription;
+use App\Module\GymSubscriptionPurchase\Controller\GymSubscriptionPurchaseCreateAction;
 use App\Module\GymSubscriptionPurchase\Repository\GymSubscriptionPurchaseRepository;
 use App\Module\User\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GymSubscriptionPurchaseRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    operations: [
+        new Post(
+            controller: GymSubscriptionPurchaseCreateAction::class,
+            securityPostDenormalize: "is_granted('ROLE_ADMIN') || object.getGymSubscription().getGym().getGymAdmin() == user",
+        ),
+        new Get(),
+        new GetCollection()
+    ],
+    normalizationContext: ['groups' => ['gym-subscription-purchase:read']],
+    denormalizationContext: ['groups' => ['gym-subscription-purchase:write']],
+)]
 class GymSubscriptionPurchase
 {
     use CreatedAtTrait;
@@ -23,26 +39,33 @@ class GymSubscriptionPurchase
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['gym-subscription-purchase:read'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'gymSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'gymSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
     private ?GymSubscription $gymSubscription = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
     private ?\DateTimeInterface $purchaseDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Groups(['gym-subscription-purchase:read'])]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column]
+    #[Groups(['gym-subscription-purchase:read'])]
     private ?bool $isActive = null;
 
     public function getId(): ?int
@@ -112,7 +135,11 @@ class GymSubscriptionPurchase
 
     public function isIsActive(): ?bool
     {
-        return $this->isActive;
+        if (new \DateTime() > $this->getEndDate()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function setIsActive(bool $isActive): self

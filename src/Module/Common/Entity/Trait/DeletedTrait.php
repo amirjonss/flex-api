@@ -8,6 +8,7 @@ use App\Module\User\Entity\User;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 trait DeletedTrait
 {
@@ -27,7 +28,7 @@ trait DeletedTrait
     /**
      * @return User|null
      */
-    public function getDeletedBy(): ?User
+    public function getDeletedBy(): ?UserInterface
     {
         return $this->deletedBy;
     }
@@ -44,7 +45,7 @@ trait DeletedTrait
     /**
      * @param User $deletedBy
      */
-    public function setDeletedBy(User $deletedBy): self
+    public function setDeletedBy(UserInterface $deletedBy): self
     {
         $this->deletedBy = $deletedBy;
         return $this;
