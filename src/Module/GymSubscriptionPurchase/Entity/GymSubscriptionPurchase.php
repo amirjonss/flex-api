@@ -16,6 +16,7 @@ use App\Module\User\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GymSubscriptionPurchaseRepository::class)]
 #[ApiResource(
@@ -45,19 +46,25 @@ class GymSubscriptionPurchase
     #[ORM\ManyToOne(inversedBy: 'gymSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
+    #[Assert\NotBlank]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'gymSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
+    #[Assert\NotBlank]
     private ?GymSubscription $gymSubscription = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
+    #[Assert\DateTime]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $purchaseDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(['gym-subscription-purchase:read', 'gym-subscription-purchase:write'])]
+    #[Assert\Date]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]

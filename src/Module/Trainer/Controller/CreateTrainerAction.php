@@ -31,6 +31,8 @@ class CreateTrainerAction extends AbstractController
 
     public function __invoke(Trainer $data): Trainer
     {
+        $this->validate($data);
+
         return ($this->createTrainerService)($data);
     }
 }

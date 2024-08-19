@@ -26,6 +26,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
@@ -66,6 +67,8 @@ class Trainer implements
 
     #[ORM\Column(length: 255)]
     #[Groups(["trainer:read", "trainer:write", "trainer:put"])]
+    #[Assert\Length(min: 3, max: 255)]
+    #[Assert\NotBlank]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -79,11 +82,13 @@ class Trainer implements
     #[ORM\ManyToOne(inversedBy: 'trainers')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["trainer:read", "trainer:write"])]
+    #[Assert\NotBlank]
     private ?Gym $gym = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["trainer:read", "trainer:write"])]
+    #[Assert\NotBlank]
     private ?User $user = null;
 
     #[ORM\ManyToOne]

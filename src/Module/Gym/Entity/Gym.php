@@ -27,6 +27,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: GymRepository::class)]
 #[ApiResource(
@@ -67,6 +68,8 @@ class Gym implements
 
     #[ORM\Column(length: 255)]
     #[Groups(['gym:read', 'gym:write'])]
+    #[Assert\Length(min: 5, max: 255)]
+    #[Assert\NotBlank]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -79,6 +82,7 @@ class Gym implements
 
     #[ORM\ManyToOne]
     #[Groups(['gym:write'])]
+    #[Assert\NotBlank]
     private ?User $gymAdmin = null;
 
     #[ORM\ManyToOne]

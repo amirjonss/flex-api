@@ -24,6 +24,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrainerSubscriptionRepository::class)]
 #[ApiResource(
@@ -63,18 +64,25 @@ class TrainerSubscription implements
     #[ORM\ManyToOne(inversedBy: 'trainerSubscriptions')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['trainer-subscription:read', 'trainer-subscription:write'])]
+    #[Assert\NotBlank]
     private ?Trainer $trainer = null;
 
     #[ORM\Column(length: 255)]
     #[Groups(['trainer-subscription:read', 'trainer-subscription:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(min:3, max: 255)]
     private ?string $name = null;
 
     #[ORM\Column]
     #[Groups(['trainer-subscription:read', 'trainer-subscription:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private ?int $duration = null;
 
     #[ORM\Column]
     #[Groups(['trainer-subscription:read', 'trainer-subscription:write'])]
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -83,6 +91,7 @@ class TrainerSubscription implements
 
     #[ORM\Column]
     #[Groups(['trainer-subscription:read', 'trainer-subscription:write'])]
+    #[Assert\NotBlank]
     private ?bool $isActive = null;
 
     #[ORM\OneToMany(mappedBy: 'trainerSubscription', targetEntity: TrainerSubscriptionPurchase::class, orphanRemoval: true)]

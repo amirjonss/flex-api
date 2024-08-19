@@ -31,6 +31,7 @@ class CreateTrainerSubscriptionPurchaseAction extends AbstractController
 
     public function __invoke(TrainerSubscriptionPurchase $data): TrainerSubscriptionPurchase
     {
+        $this->validate($data);
         return ($this->service)($data);
     }
 }

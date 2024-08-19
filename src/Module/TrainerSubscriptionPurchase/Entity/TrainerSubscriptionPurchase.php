@@ -3,12 +3,9 @@
 namespace App\Module\TrainerSubscriptionPurchase\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
-use ApiPlatform\Metadata\Put;
-use App\Module\Common\Controller\DeleteAction;
 use App\Module\Common\Entity\Trait\CreatedAtTrait;
 use App\Module\Common\Entity\Trait\DeletedTrait;
 use App\Module\Common\Entity\Trait\UpdatedTrait;
@@ -19,6 +16,7 @@ use App\Module\User\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TrainerSubscriptionPurchaseRepository::class)]
 #[ApiResource(
@@ -48,19 +46,25 @@ class TrainerSubscriptionPurchase
     #[ORM\ManyToOne(inversedBy: 'trainerSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["trainer-subscription-purchase:read", "trainer-subscription-purchase:write"])]
+    #[Assert\NotBlank]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'trainerSubscriptionPurchases')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(["trainer-subscription-purchase:read", "trainer-subscription-purchase:write"])]
+    #[Assert\NotBlank]
     private ?TrainerSubscription $trainerSubscription = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Groups(["trainer-subscription-purchase:read", "trainer-subscription-purchase:write"])]
+    #[Assert\NotBlank]
+    #[Assert\DateTime]
     private ?\DateTimeInterface $purchaseDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Groups(["trainer-subscription-purchase:read", "trainer-subscription-purchase:write"])]
+    #[Assert\NotBlank]
+    #[Assert\Date]
     private ?\DateTimeInterface $startDate = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
@@ -68,6 +72,7 @@ class TrainerSubscriptionPurchase
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
     private ?bool $isActive = null;
 
     public function getId(): ?int
