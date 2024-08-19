@@ -1,4 +1,4 @@
-# GymMaster API
+# Flex API
 ![img.png](img.png)
 
 Flex is a platform for managing gyms that allows gym owners and trainers to manage their subscription plans, and users to purchase these subscriptions. The project is built using Symfony and API Platform.
